@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Resume Preview | Candidate Portal</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Inter", "Segoe UI", sans-serif; background: #f4f7fb; display: flex; }
+
+        .sidebar {
+            width: 260px; background: linear-gradient(to bottom, #1e3a8a, #2563eb);
+            min-height: 100vh; padding: 30px 20px; color: white;
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .sidebar h2 { font-size: 22px; font-weight: 800; margin-bottom: 20px; }
+        .sidebar a {
+            display: block; padding: 14px 15px; margin-bottom: 12px;
+            text-decoration: none; color: white; border-radius: 12px;
+        }
+        .sidebar a:hover { background: rgba(255,255,255,0.15); }
+        .user-box { font-size: 13px; margin-top: 20px; }
+        .logout-btn {
+            padding: 10px; background: #ef4444; text-align: center;
+            border-radius: 10px; text-decoration: none; color: white; font-weight: 600;
+        }
+
+        .main { flex: 1; padding: 50px; }
+        .resume-card {
+            background: white; max-width: 900px; padding: 50px;
+            border-radius: 22px; box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+        }
+
+        .job-title { color: #2563eb; font-weight: 700; font-size: 16px; margin-bottom: 20px; }
+
+        .success-banner {
+            background: #dcfce7; color: #166534; padding: 14px 18px;
+            border-radius: 12px; margin-bottom: 20px; font-weight: 700;
+            border-left: 4px solid #16a34a;
+        }
+
+        /* Built resume styles */
+        .resume-header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #e5e7eb; }
+        .resume-header h2 { font-size: 28px; font-weight: 900; color: #111; }
+        .resume-header p { color: #6b7280; margin-top: 6px; font-size: 14px; }
+
+        .section { margin-top: 28px; }
+        .section-title {
+            font-weight: 800; font-size: 14px; color: #1d4ed8; text-transform: uppercase;
+            letter-spacing: 0.5px; border-bottom: 2px solid #dbeafe;
+            padding-bottom: 6px; margin-bottom: 12px;
+        }
+        .section-body { font-size: 14px; color: #374151; line-height: 1.7; white-space: pre-wrap; }
+
+        .skills-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+        .skill-tag {
+            background: #eff6ff; color: #1d4ed8;
+            padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;
+        }
+
+        /* Uploaded resume styles */
+        .uploaded-preview {
+            background: #f9fafb; padding: 20px; border-radius: 12px;
+            max-height: 450px; overflow-y: auto; white-space: pre-wrap;
+            font-size: 13px; line-height: 1.7; color: #374151;
+            border: 1px solid #e5e7eb;
+        }
+
+        .btn-group { display: flex; gap: 15px; margin-top: 35px; flex-wrap: wrap; }
+        .btn { flex: 1; text-align: center; padding: 14px; border-radius: 14px; font-weight: 800; text-decoration: none; color: white; min-width: 140px; }
+        .btn-download { background: linear-gradient(to right, #2563eb, #1d4ed8); }
+        .btn-score    { background: linear-gradient(to right, #16a34a, #15803d); }
+        .btn-edit     { background: linear-gradient(to right, #f59e0b, #d97706); }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div>
+        <h2>Candidate Portal</h2>
+        <a href="/candidate">🏠 Dashboard</a>
+        <a href="/candidate/upload">📄 Upload Resume</a>
+        <a href="/candidate/create">✍️ Build Resume</a>
+        <div class="user-box">Logged in as <b>{{ session['user'] }}</b></div>
+    </div>
+    <a href="/logout" class="logout-btn">Logout</a>
+</div>
+
+<div class="main">
+    <div class="resume-card">
+
+        {% if session.get("selected_job") or session.get("job_id") %}
+            <div class="job-title">Target Role: {{ session.get("selected_job", "") }}</div>
+        {% endif %}
+
+        {% if session.get("improved") %}
+            <div class="success-banner">🚀 Resume improved with suggested skills!</div>
+        {% endif %}
+
+        {% if resume is mapping and resume.get('name') %}
+            <!-- ===== BUILT RESUME PREVIEW ===== -->
+            <div class="resume-header">
+                <h2>{{ resume.name }}</h2>
+                <p>{{ resume.email }} &nbsp;|&nbsp; {{ resume.phone }}</p>
+            </div>
+
+            {% if resume.get('summary') %}
+            <div class="section">
+                <div class="section-title">Professional Summary</div>
+                <div class="section-body">{{ resume.summary }}</div>
+            </div>
+            {% endif %}
+
+            {% if resume.get('skills') %}
+            <div class="section">
+                <div class="section-title">Skills</div>
+                <div class="skills-grid">
+                    {% for skill in resume.skills %}
+                        <div class="skill-tag">{{ skill }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if resume.get('experience') %}
+            <div class="section">
+                <div class="section-title">Work Experience</div>
+                <div class="section-body">{{ resume.experience }}</div>
+            </div>
+            {% endif %}
+
+            {% if resume.get('projects') %}
+            <div class="section">
+                <div class="section-title">Projects</div>
+                <div class="section-body">{{ resume.projects }}</div>
+            </div>
+            {% endif %}
+
+            {% if resume.get('education') %}
+            <div class="section">
+                <div class="section-title">Education</div>
+                <div class="section-body">{{ resume.education }}</div>
+            </div>
+            {% endif %}
+
+            {% if resume.get('certifications') %}
+            <div class="section">
+                <div class="section-title">Certifications</div>
+                <div class="section-body">{{ resume.certifications }}</div>
+            </div>
+            {% endif %}
+
+        {% else %}
+            <!-- ===== UPLOADED RESUME PREVIEW ===== -->
+            <div class="section-title" style="margin-bottom:12px;">Uploaded Resume Text</div>
+            <div class="uploaded-preview">{{ resume }}</div>
+        {% endif %}
+
+        <div class="btn-group">
+            {% if resume is mapping and resume.get('name') %}
+                <a href="/candidate/download" class="btn btn-download">⬇ Download PDF</a>
+                <a href="/candidate/create" class="btn btn-edit">✏ Edit Resume</a>
+            {% else %}
+                <a href="/candidate/upload" class="btn btn-edit">🔁 Re-Upload</a>
+            {% endif %}
+            <a href="/candidate/check" class="btn btn-score">🤖 Check AI Match Score</a>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

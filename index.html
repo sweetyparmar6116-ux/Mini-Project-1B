@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TalentIQ | AI Resume Screening Platform</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Inter", "Segoe UI", sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            width: 100%;
+            padding: 22px 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 850;
+            color: #2563eb;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links a {
+            margin-left: 28px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 650;
+            color: #334155;
+            transition: 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: #2563eb;
+        }
+
+        .nav-btn {
+            padding: 10px 16px;
+            border-radius: 12px;
+            background: #2563eb;
+            color: white !important;
+            font-weight: 700;
+        }
+
+        .nav-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 90px 80px;
+            gap: 50px;
+        }
+
+        .hero-text {
+            max-width: 560px;
+        }
+
+        .hero-text h1 {
+            font-size: 58px;
+            font-weight: 900;
+            line-height: 1.05;
+            letter-spacing: -1px;
+            margin-bottom: 22px;
+        }
+
+        .hero-text h1 span {
+            color: #2563eb;
+        }
+
+        .hero-text p {
+            font-size: 16px;
+            line-height: 1.7;
+            color: #475569;
+            margin-bottom: 38px;
+        }
+
+        /* ===== CTA BUTTONS ===== */
+        .cta {
+            display: flex;
+            gap: 18px;
+        }
+
+        .btn {
+            padding: 14px 22px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 750;
+            text-decoration: none;
+            transition: 0.25s;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, #2563eb, #1d4ed8);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            opacity: 0.92;
+        }
+
+        .btn-outline {
+            border: 2px solid #2563eb;
+            color: #2563eb;
+            background: white;
+        }
+
+        .btn-outline:hover {
+            background: #eff6ff;
+            transform: translateY(-2px);
+        }
+
+        /* ===== HERO PANEL ===== */
+        .hero-panel {
+            width: 420px;
+            background: white;
+            border-radius: 26px;
+            padding: 38px;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+        }
+
+        .hero-panel h3 {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 18px;
+            color: #0f172a;
+        }
+
+        .feature {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            margin-top: 6px;
+            background: #22c55e;
+        }
+
+        .feature p {
+            font-size: 14px;
+            color: #475569;
+            line-height: 1.5;
+        }
+
+        /* ===== STATS SECTION ===== */
+        .stats {
+            width: 100%;
+            padding: 60px 80px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            text-align: center;
+        }
+
+        .stat-box h2 {
+            font-size: 34px;
+            font-weight: 900;
+            color: #2563eb;
+        }
+
+        .stat-box p {
+            margin-top: 6px;
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            padding: 28px;
+            text-align: center;
+            font-size: 13px;
+            color: #64748b;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media(max-width: 950px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .cta {
+                justify-content: center;
+            }
+
+            .hero-panel {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <div class="logo">TalentIQ</div>
+
+        <div class="nav-links">
+
+            {% if session.get("user") %}
+
+                {% if session.get("role") == "hr" %}
+                    <a href="/hr">Dashboard</a>
+                {% else %}
+                    <a href="/candidate">Dashboard</a>
+                {% endif %}
+
+                <a class="nav-btn" href="/logout">Logout</a>
+
+            {% else %}
+
+                <a href="/login">Login</a>
+                <a href="/signup">Sign Up</a>
+                <a class="nav-btn" href="/login">Get Started</a>
+
+            {% endif %}
+
+        </div>
+    </div>
+
+
+    <!-- HERO -->
+    <section class="hero">
+
+        <!-- TEXT -->
+        <div class="hero-text">
+
+            {% if session.get("user") %}
+                <p style="font-weight:700; color:#2563eb; margin-bottom:15px;">
+                    Welcome back, {{ session["user"] }} 👋
+                </p>
+            {% endif %}
+
+            <h1>
+                Smarter Hiring with <span>AI Resume Intelligence</span>
+            </h1>
+
+            <p>
+                TalentIQ is an AI-powered resume screening platform that helps HR teams
+                shortlist candidates instantly and allows applicants to evaluate their
+                resume match score against job openings with skill gap insights.
+            </p>
+
+            <div class="cta">
+
+                {% if session.get("user") %}
+                    
+                    {% if session.get("role") == "hr" %}
+                        <a href="/hr" class="btn btn-primary">
+                            Go to HR Dashboard →
+                        </a>
+                    {% else %}
+                        <a href="/candidate" class="btn btn-primary">
+                            Go to Candidate Dashboard →
+                        </a>
+                    {% endif %}
+
+                {% else %}
+
+                    <a href="/login" class="btn btn-primary">
+                        Start Screening →
+                    </a>
+
+                    <a href="/signup" class="btn btn-outline">
+                        Create Account
+                    </a>
+
+                {% endif %}
+
+            </div>
+        </div>
+
+
+        <!-- HERO PANEL -->
+        <div class="hero-panel">
+            <h3>Why TalentIQ?</h3>
+
+            <div class="feature">
+                <div class="dot"></div>
+                <p>Upload multiple job openings with role-based screening.</p>
+            </div>
+
+            <div class="feature">
+                <div class="dot"></div>
+                <p>AI match scoring using Semantic + TF-IDF similarity.</p>
+            </div>
+
+            <div class="feature">
+                <div class="dot"></div>
+                <p>Skill gap detection: matched vs missing skills.</p>
+            </div>
+
+            <div class="feature">
+                <div class="dot"></div>
+                <p>Candidate resume builder + PDF export.</p>
+            </div>
+
+            <div class="feature">
+                <div class="dot"></div>
+                <p>Professional HR + Candidate portal dashboards.</p>
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- STATS -->
+    <section class="stats">
+
+        <div class="stat-box">
+            <h2>AI</h2>
+            <p>Powered Screening Engine</p>
+        </div>
+
+        <div class="stat-box">
+            <h2>Multi</h2>
+            <p>Job Openings Supported</p>
+        </div>
+
+        <div class="stat-box">
+            <h2>Fast</h2>
+            <p>Instant Candidate Shortlisting</p>
+        </div>
+
+        <div class="stat-box">
+            <h2>Smart</h2>
+            <p>Skill Gap Recommendations</p>
+        </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+    <footer>
+        © 2026 TalentIQ — AI Resume Screening & Candidate Portal
+    </footer>
+
+</body>
+</html>

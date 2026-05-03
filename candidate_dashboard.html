@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Candidate Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Inter", "Segoe UI", sans-serif;
+            background: #f4f7fb;
+            display: flex;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(to bottom, #1e3a8a, #2563eb);
+            min-height: 100vh;
+            padding: 30px 20px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .sidebar-top h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 14px 15px;
+            margin-bottom: 12px;
+            text-decoration: none;
+            color: white;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .sidebar a:hover { background: rgba(255, 255, 255, 0.15); }
+        .active { background: rgba(255, 255, 255, 0.25); }
+
+        .user-box {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-top: 30px;
+        }
+
+        .logout-btn {
+            margin-top: 10px;
+            display: block;
+            padding: 10px;
+            background: #ef4444;
+            text-align: center;
+            border-radius: 10px;
+            text-decoration: none;
+            color: white;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main { flex: 1; padding: 40px; }
+
+        .header h1 { font-size: 30px; font-weight: 700; color: #111827; }
+        .header p { margin-top: 6px; color: #555; font-size: 15px; margin-bottom: 30px; }
+
+        /* ===== STATUS CARDS ===== */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+
+        .stat-card h3 { font-size: 14px; color: #666; margin-bottom: 8px; }
+        .stat-card .value { font-size: 22px; font-weight: 700; color: #111827; }
+        .highlight { color: #2563eb; }
+
+        /* ===== JOB GRID ===== */
+        .section-header {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .section-header h1 { font-size: 24px; font-weight: 700; color: #111827; }
+        .job-count {
+            font-size: 13px;
+            background: #dbeafe;
+            color: #1d4ed8;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-weight: 600;
+        }
+
+        .job-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 45px;
+        }
+
+        .job-card {
+            background: white;
+            padding: 25px;
+            border-radius: 18px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            transition: 0.25s;
+            border: 1px solid transparent;
+        }
+
+        .job-card:hover {
+            transform: translateY(-6px);
+            border-color: #bfdbfe;
+            box-shadow: 0 12px 30px rgba(37,99,235,0.18);
+        }
+
+        .job-card.selected { border: 2px solid #2563eb; }
+        .job-card h3 { font-size: 18px; margin-bottom: 10px; }
+
+        .apply-btn {
+            display: inline-block;
+            padding: 10px 16px;
+            border-radius: 12px;
+            background: linear-gradient(to right, #2563eb, #1d4ed8);
+            color: white;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        /* ===== RESUME OPTIONS ===== */
+        .resume-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 25px;
+        }
+
+        .option-card {
+            background: white;
+            padding: 30px;
+            border-radius: 18px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+
+        .big-btn {
+            display: inline-block;
+            padding: 12px 20px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 650;
+            color: white;
+            text-decoration: none;
+            background: linear-gradient(to right, #16a34a, #15803d);
+        }
+
+        .blue-btn { background: linear-gradient(to right, #2563eb, #1d4ed8); }
+
+        .disabled { opacity: 0.5; pointer-events: none; }
+
+        .empty {
+            padding: 40px;
+            text-align: center;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            color: #6b7280;
+            font-size: 15px;
+            margin-bottom: 40px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="sidebar">
+    <div class="sidebar-top">
+        <h2>Candidate Portal</h2>
+        <a href="/candidate" class="active">🏠 Dashboard</a>
+        <div class="user-box">
+            Logged in as <b>{{ session['user'] }}</b>
+        </div>
+    </div>
+    <a href="/logout" class="logout-btn">Logout</a>
+</div>
+
+<div class="main">
+
+    <div class="header">
+        <h1>Welcome Back</h1>
+        <p>Select a job role and manage your resume smartly.</p>
+    </div>
+
+    <!-- STATUS CARDS -->
+    <div class="stats">
+        <div class="stat-card">
+            <h3>Selected Job</h3>
+            <div class="value highlight">
+                {{ selected_job if selected_job else "None Selected" }}
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <h3>Resume Status</h3>
+            <div class="value">
+                {% if session.get('resume_text') %}
+                    Uploaded / Created
+                {% else %}
+                    Not Uploaded
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <h3>Last Match Score</h3>
+            <div class="value">
+                {{ session.get('last_score', '—') }}
+                {% if session.get('last_score') %}%{% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- JOB OPENINGS — only active JDs shown -->
+    <div class="section-header">
+        <h1>Available Job Openings</h1>
+        {% if openings %}
+            <span class="job-count">{{ openings|length }} open</span>
+        {% endif %}
+    </div>
+
+    {% if openings %}
+    <div class="job-grid">
+        {% for job in openings %}
+        <div class="job-card {% if selected_job == job.title %}selected{% endif %}">
+            <h3>{{ job.title }}</h3>
+            <a class="apply-btn" href="/candidate/select_job/{{ job._id }}">
+                {% if selected_job == job.title %}✅ Selected{% else %}Apply Now →{% endif %}
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <div class="empty">
+            No job openings available at the moment. Check back soon.
+        </div>
+    {% endif %}
+
+    <!-- RESUME OPTIONS -->
+    <div class="header">
+        <h1>Resume Options</h1>
+    </div>
+
+    <div class="resume-options">
+
+        <div class="option-card">
+            <h2>📄 Upload Resume</h2>
+            <p style="margin: 10px 0 18px; color:#555; font-size:14px;">
+                Upload your existing resume and get an AI match evaluation.
+            </p>
+            <a href="/candidate/upload"
+               class="big-btn blue-btn {% if not selected_job %}disabled{% endif %}">
+               Upload Resume →
+            </a>
+            {% if not selected_job %}
+                <p style="margin-top:10px;font-size:12px;color:#9ca3af;">
+                    Select a job opening first
+                </p>
+            {% endif %}
+        </div>
+
+        <div class="option-card">
+            <h2>✍️ Create Resume</h2>
+            <p style="margin: 10px 0 18px; color:#555; font-size:14px;">
+                Build a professional resume inside the portal and download it as PDF.
+            </p>
+            <a href="/candidate/create"
+               class="big-btn {% if not selected_job %}disabled{% endif %}">
+               Build Resume →
+            </a>
+            {% if not selected_job %}
+                <p style="margin-top:10px;font-size:12px;color:#9ca3af;">
+                    Select a job opening first
+                </p>
+            {% endif %}
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

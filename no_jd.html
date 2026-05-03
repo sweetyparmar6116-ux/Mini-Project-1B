@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>No Job Description | TalentIQ</title>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Inter", "Segoe UI", sans-serif;
+            background: #f4f7fb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .card {
+            background: white;
+            width: 500px;
+            padding: 50px;
+            border-radius: 24px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 900;
+            color: #dc2626;
+            margin-bottom: 15px;
+        }
+
+        p {
+            font-size: 15px;
+            color: #475569;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 22px;
+            border-radius: 14px;
+            background: linear-gradient(to right, #2563eb, #1d4ed8);
+            color: white;
+            font-weight: 700;
+            text-decoration: none;
+            transition: 0.25s;
+        }
+
+        .btn:hover {
+            opacity: 0.92;
+            transform: translateY(-2px);
+        }
+
+        .secondary {
+            display: block;
+            margin-top: 15px;
+            font-size: 13px;
+            color: #64748b;
+            text-decoration: none;
+        }
+
+        .secondary:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+
+        <h1>No Job Selected</h1>
+
+        <p>
+            You cannot check your AI match score because no Job Description
+            is currently selected or available.
+            <br><br>
+            Please go back and select a job opening first.
+        </p>
+
+        {% if session.get("role") == "candidate" %}
+            <a href="/candidate" class="btn">
+                Go to Candidate Dashboard →
+            </a>
+        {% elif session.get("role") == "hr" %}
+            <a href="/hr" class="btn">
+                Go to HR Dashboard →
+            </a>
+        {% else %}
+            <a href="/" class="btn">
+                Return to Home →
+            </a>
+        {% endif %}
+
+        <a href="/" class="secondary">← Back to Home</a>
+
+    </div>
+
+</body>
+</html>

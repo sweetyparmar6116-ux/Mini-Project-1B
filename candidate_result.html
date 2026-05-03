@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>AI Match Result | Candidate Portal</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Inter", "Segoe UI", sans-serif; background: #f4f7fb; display: flex; }
+
+        .sidebar {
+            width: 260px; background: linear-gradient(to bottom, #1e3a8a, #2563eb);
+            min-height: 100vh; padding: 30px 20px; color: white;
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .sidebar h2 { font-size: 22px; font-weight: 800; margin-bottom: 25px; }
+        .sidebar a {
+            display: block; padding: 14px 15px; margin-bottom: 12px;
+            text-decoration: none; color: white; border-radius: 12px;
+        }
+        .sidebar a:hover { background: rgba(255,255,255,0.15); }
+        .user-box { font-size: 13px; margin-top: 20px; opacity: 0.9; }
+        .logout-btn {
+            padding: 10px; background: #ef4444; text-align: center;
+            border-radius: 10px; text-decoration: none; color: white; font-weight: 600; font-size: 13px;
+        }
+
+        .main { flex: 1; padding: 50px; }
+        .result-card {
+            background: white; max-width: 1000px; padding: 45px;
+            border-radius: 24px; box-shadow: 0 12px 35px rgba(0,0,0,0.08);
+        }
+        .job-title { font-size: 18px; color: #2563eb; font-weight: 700; margin-bottom: 25px; }
+
+        /* SCORE RING */
+        .score-area { display: flex; align-items: center; gap: 40px; margin-bottom: 30px; flex-wrap: wrap; }
+        .score-ring {
+            width: 180px; height: 180px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .score-inner {
+            width: 140px; height: 140px; border-radius: 50%; background: white;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .score-inner h2 { font-size: 42px; font-weight: 900; }
+        .score-inner p { font-size: 13px; color: #6b7280; }
+
+        .score-breakdown { flex: 1; min-width: 200px; }
+        .score-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f3f4f6; }
+        .score-row:last-child { border: none; }
+        .score-label { font-size: 14px; color: #374151; }
+        .score-val { font-size: 14px; font-weight: 700; }
+
+        .interpretation { font-size: 16px; font-weight: 700; margin-bottom: 25px; }
+
+        /* PII REDACTION NOTICE */
+        .pii-notice {
+            background: #ecfdf5; border: 1px solid #6ee7b7; color: #065f46;
+            padding: 10px 16px; border-radius: 10px; font-size: 13px;
+            font-weight: 600; margin-bottom: 25px; display: flex;
+            align-items: center; gap: 8px;
+        }
+
+        /* SKILLS */
+        .skills-section { margin-bottom: 25px; }
+        .skills-section h3 { font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+        .tag-box { display: flex; flex-wrap: wrap; gap: 8px; }
+        .tag { padding: 7px 13px; border-radius: 999px; font-size: 13px; font-weight: 600; }
+        .matched { background: #dcfce7; color: #166534; }
+        .empty-note { font-size: 14px; color: #6b7280; }
+
+        /* CATEGORY GAPS — replaces raw missing skills */
+        .gaps-section { margin-bottom: 25px; }
+        .gaps-section h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+        .gaps-section .subtitle {
+            font-size: 13px; color: #6b7280; margin-bottom: 16px; font-style: italic;
+        }
+        /* Actual gap — orange */
+        .gap-item {
+            background: #fff7ed; border: 1px solid #fed7aa;
+            border-radius: 14px; padding: 16px 20px; margin-bottom: 12px;
+        }
+        /* Fallback trend — blue tint */
+        .gap-item-trend {
+            background: #eff6ff; border: 1px solid #bfdbfe;
+        }
+        .gap-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .gap-name { font-size: 15px; font-weight: 700; color: #92400e; }
+        .gap-item-trend .gap-name { color: #1d4ed8; }
+
+        .gap-label {
+            font-size: 11px; font-weight: 700; padding: 3px 10px;
+            border-radius: 999px; background: #fee2e2; color: #991b1b;
+        }
+        .trend-label {
+            font-size: 11px; font-weight: 700; padding: 3px 10px;
+            border-radius: 999px; background: #dbeafe; color: #1d4ed8;
+        }
+
+        .gap-bar-wrap { background: #fde8c9; border-radius: 999px; height: 6px; margin-bottom: 8px; }
+        .gap-bar { background: #f97316; border-radius: 999px; height: 6px; }
+        .gap-bar-trend { background: #3b82f6; }
+        .gap-item-trend .gap-bar-wrap { background: #dbeafe; }
+
+        .gap-trend { font-size: 12px; color: #78350f; line-height: 1.5; }
+        .gap-item-trend .gap-trend { color: #1e40af; }
+
+        .no-gaps {
+            background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 14px;
+            padding: 18px 20px; font-size: 14px; color: #166534; font-weight: 600;
+        }
+
+        /* SUGGESTIONS */
+        .suggestions {
+            background: #fffbeb; border: 1px solid #fde68a; border-radius: 14px;
+            padding: 20px; margin-top: 25px;
+        }
+        .suggestions h3 { font-size: 16px; font-weight: 700; color: #92400e; margin-bottom: 12px; }
+        .suggestions li { font-size: 14px; color: #78350f; margin-bottom: 8px; margin-left: 18px; }
+
+        /* BUTTONS */
+        .btn-group { display: flex; gap: 15px; margin-top: 30px; flex-wrap: wrap; }
+        .btn { flex: 1; text-align: center; padding: 14px; border-radius: 14px; font-weight: 800; text-decoration: none; color: white; min-width: 140px; }
+        .btn-dashboard { background: linear-gradient(to right, #2563eb, #1d4ed8); }
+        .btn-edit      { background: linear-gradient(to right, #16a34a, #15803d); }
+        .btn-download  { background: linear-gradient(to right, #6366f1, #4f46e5); }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div>
+        <h2>Candidate Portal</h2>
+        <a href="/candidate">🏠 Dashboard</a>
+        <a href="/candidate/upload">📄 Upload Resume</a>
+        <a href="/candidate/create">✍️ Build Resume</a>
+        <div class="user-box">Logged in as <b>{{ session['user'] }}</b></div>
+    </div>
+    <a href="/logout" class="logout-btn">Logout</a>
+</div>
+
+<div class="main">
+    <div class="result-card">
+
+        <div class="job-title">Match Result — {{ job_title }}</div>
+
+        <!-- PII REDACTION NOTICE -->
+        {% if redacted_count and redacted_count > 0 %}
+        <div class="pii-notice">
+            🛡️ {{ redacted_count }} personal identifier{{ 's' if redacted_count != 1 else '' }}
+            (email, phone, etc.) were automatically removed before scoring — your result reflects skills only.
+        </div>
+        {% else %}
+        <div class="pii-notice">
+            🛡️ Bias-free scoring applied — personal identifiers stripped before AI evaluation.
+        </div>
+        {% endif %}
+
+        {% set ring_color = "#16a34a" if final >= 80 else "#f59e0b" if final >= 60 else "#dc2626" %}
+
+        <div class="score-area">
+            <div class="score-ring" style="background: conic-gradient({{ ring_color }} {{ final }}%, #e5e7eb 0);">
+                <div class="score-inner">
+                    <h2 style="color:{{ ring_color }}">{{ final }}%</h2>
+                    <p>Match Score</p>
+                </div>
+            </div>
+
+            <div class="score-breakdown">
+                <div class="score-row">
+                    <span class="score-label">🧠 Semantic (SBERT)</span>
+                    <span class="score-val">{{ semantic }}%</span>
+                </div>
+                <div class="score-row">
+                    <span class="score-label">📊 Keyword (TF-IDF)</span>
+                    <span class="score-val">{{ tfidf }}%</span>
+                </div>
+                <div class="score-row">
+                    <span class="score-label">⚡ Final (60/40 blend)</span>
+                    <span class="score-val" style="color:{{ ring_color }}">{{ final }}%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="interpretation">
+            {% if final >= 80 %}🔥 Excellent match! You're highly aligned with this role.
+            {% elif final >= 60 %}👍 Good match. Some targeted upskilling can strengthen your profile.
+            {% else %}⚠️ There are skill gaps between your profile and this role.{% endif %}
+        </div>
+
+        <!-- MATCHED SKILLS -->
+        <div class="skills-section">
+            <h3>✅ Matched Skills ({{ matched|length }})</h3>
+            <div class="tag-box">
+                {% if matched %}
+                    {% for s in matched[:15] %}<span class="tag matched">{{ s }}</span>{% endfor %}
+                {% else %}
+                    <div class="empty-note">No major matched skills detected against this JD.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- SKILL CATEGORY GAPS / MARKET TRENDS -->
+        <div class="gaps-section">
+            <h3>📈 Areas to Grow & Market Trends</h3>
+
+            {% if category_gaps %}
+                {% set has_real_gaps = category_gaps | selectattr('is_gap') | list %}
+
+                {% if has_real_gaps %}
+                <p class="subtitle">
+                    Based on this role's requirements, here are the skill domains where your profile
+                    could be stronger — along with what the market is currently prioritising.
+                </p>
+                {% else %}
+                <p class="subtitle">
+                    Your skills cover this role well. Here are the top trending domains the
+                    market is prioritising right now — worth staying ahead of.
+                </p>
+                {% endif %}
+
+                {% for gap in category_gaps %}
+                <div class="gap-item {% if not gap.is_gap %}gap-item-trend{% endif %}">
+                    <div class="gap-header">
+                        <span class="gap-name">{{ gap.category }}</span>
+                        {% if not gap.is_gap %}
+                            <span class="trend-label">🔥 Trending</span>
+                        {% else %}
+                            <span class="gap-label">📌 Gap Detected</span>
+                        {% endif %}
+                    </div>
+                    <div class="gap-bar-wrap">
+                        <div class="gap-bar {% if not gap.is_gap %}gap-bar-trend{% endif %}"
+                             style="width: {{ gap.weight }}%;"></div>
+                    </div>
+                    <div class="gap-trend">📊 {{ gap.trend }}</div>
+                </div>
+                {% endfor %}
+
+            {% else %}
+                <p class="subtitle">Here are the top trending skill domains in the current market.</p>
+            {% endif %}
+        </div>
+
+        <!-- GENERAL SUGGESTIONS -->
+        <div class="suggestions">
+            <h3>💡 How to Strengthen Your Profile</h3>
+            <ul>
+                <li>Take an online course or build a project in any growth area shown above.</li>
+                <li>Rewrite your summary to reflect the type of role you're targeting.</li>
+                <li>Quantify your experience — for example, "Reduced load time by 40%".</li>
+                <li>Add relevant certifications that back up your existing skills.</li>
+                <li>Tailor your resume language to each role you apply for.</li>
+            </ul>
+        </div>
+
+        <div class="btn-group">
+            <a href="/candidate" class="btn btn-dashboard">← Dashboard</a>
+            <a href="/candidate/create" class="btn btn-edit">Edit Resume →</a>
+            {% if session.get('resume_data') %}
+                <a href="/candidate/download" class="btn btn-download">⬇ Download PDF</a>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

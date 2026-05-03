@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>HR Dashboard | TalentIQ</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Inter", "Segoe UI", sans-serif; background: #f7f9fc; color: #222; }
+
+        .navbar {
+            width: 100%; background: white; padding: 18px 50px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .nav-left h1 { font-size: 22px; font-weight: 700; color: #2563eb; }
+        .nav-left span { font-size: 14px; color: #666; }
+        .user-info { font-size: 14px; color: #555; }
+        .user-info b { color: #2563eb; }
+        .logout-btn {
+            text-decoration: none; background: #ef4444; color: white;
+            padding: 10px 18px; border-radius: 12px; font-size: 14px; font-weight: 600;
+        }
+        .logout-btn:hover { background: #dc2626; }
+
+        .container { width: 90%; max-width: 1150px; margin: auto; padding: 50px 0; }
+
+        .page-header { margin-bottom: 40px; }
+        .page-header h2 { font-size: 32px; font-weight: 700; }
+        .page-header p { margin-top: 8px; font-size: 15px; color: #555; }
+
+        .bias-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: #ecfdf5; border: 1px solid #6ee7b7;
+            color: #065f46; padding: 8px 16px; border-radius: 999px;
+            font-size: 13px; font-weight: 600; margin-top: 12px;
+        }
+
+        .grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: white; border-radius: 18px; padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+            border: 1px solid transparent; transition: 0.25s;
+        }
+        .card:hover { transform: translateY(-4px); border-color: #dbeafe; }
+        .card h3 { font-size: 20px; font-weight: 650; margin-bottom: 10px; }
+        .card p { font-size: 14px; color: #555; margin-bottom: 18px; line-height: 1.5; }
+
+        .error-box {
+            background: #fee2e2; color: #991b1b; padding: 12px 16px;
+            border-radius: 12px; font-size: 14px; margin-bottom: 18px;
+            border: 1px solid #fca5a5;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%; padding: 12px; margin-bottom: 15px;
+            border-radius: 12px; border: 1px solid #d1d5db; font-size: 14px;
+        }
+        input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+
+        .upload-box {
+            border: 2px dashed #cbd5e1; padding: 25px; border-radius: 14px;
+            text-align: center; background: #f9fbff; cursor: pointer; transition: 0.2s;
+        }
+        .upload-box:hover { border-color: #2563eb; background: #eff6ff; }
+        input[type="file"] { display: none; }
+        .upload-box label { display: block; font-size: 14px; color: #2563eb; font-weight: 600; cursor: pointer; }
+        .upload-box small { display: block; margin-top: 6px; color: #777; font-size: 12px; }
+        #jdFileName, #resumeFileName { margin-top: 8px; font-size: 12px; color: #374151; }
+
+        button {
+            width: 100%; margin-top: 18px; padding: 14px; border: none;
+            border-radius: 12px; background: linear-gradient(to right, #2563eb, #1d4ed8);
+            color: white; font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.25s;
+        }
+        button:hover { opacity: 0.9; }
+
+        /* JOB LIST */
+        .job-list { margin-top: 20px; }
+        .job-item {
+            padding: 14px 16px; border-radius: 12px; background: #f9fafb;
+            border: 1px solid #e5e7eb; margin-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 10px;
+        }
+        .job-item.inactive { opacity: 0.55; background: #f3f4f6; }
+
+        .job-item-left { display: flex; align-items: center; gap: 10px; flex: 1; }
+        .job-item b { font-size: 14px; }
+
+        .status-pill {
+            font-size: 11px; font-weight: 700; padding: 3px 10px;
+            border-radius: 999px;
+        }
+        .pill-active   { background: #dcfce7; color: #166534; }
+        .pill-inactive { background: #f3f4f6; color: #6b7280; }
+
+        .job-actions { display: flex; gap: 8px; }
+
+        .toggle-btn {
+            font-size: 12px; text-decoration: none; color: white;
+            padding: 6px 11px; border-radius: 9px; font-weight: 600;
+        }
+        .toggle-on  { background: #f59e0b; }
+        .toggle-off { background: #16a34a; }
+
+        .delete-btn {
+            font-size: 12px; text-decoration: none; color: white;
+            background: #dc2626; padding: 6px 11px; border-radius: 9px; font-weight: 600;
+        }
+        .delete-btn:hover { background: #b91c1c; }
+
+        select {
+            width: 100%; padding: 12px; border-radius: 12px;
+            border: 1px solid #d1d5db; font-size: 14px; margin-top: 10px;
+        }
+
+        /* HISTORY */
+        .history-section { margin-top: 50px; }
+        .history-section h3 { font-size: 22px; font-weight: 700; margin-bottom: 20px; }
+        .history-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 18px;
+        }
+        .history-card {
+            background: white; border-radius: 16px; padding: 22px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.06); border: 1px solid #e5e7eb;
+        }
+        .history-card h4 { font-size: 16px; font-weight: 700; color: #111; margin-bottom: 6px; }
+        .history-card .meta { font-size: 12px; color: #6b7280; margin-bottom: 14px; }
+        .history-card .counts { display: flex; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+        .count-pill {
+            padding: 5px 12px; border-radius: 999px; font-size: 12px; font-weight: 600;
+        }
+        .count-green { background: #dcfce7; color: #166534; }
+        .count-red   { background: #fee2e2; color: #991b1b; }
+        .count-blue  { background: #dbeafe; color: #1d4ed8; }
+        .view-btn {
+            display: inline-block; padding: 8px 16px; border-radius: 10px;
+            background: #2563eb; color: white; font-size: 13px; font-weight: 600;
+            text-decoration: none;
+        }
+        .empty-history { color: #6b7280; font-size: 14px; padding: 20px 0; }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="nav-left">
+        <h1>TalentIQ HR</h1>
+        <span>AI Resume Screening Dashboard</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:20px;">
+        <div class="user-info">Logged in as <b>{{ session['user'] }}</b></div>
+        <a href="/logout" class="logout-btn">Logout</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="page-header">
+        <h2>HR Dashboard</h2>
+        <p>Upload job openings, manage descriptions, and screen candidates with AI.</p>
+        <div class="bias-badge">
+            🛡️ Bias-Free Mode Active — Candidate names are anonymized before scoring
+        </div>
+    </div>
+
+    {% if error %}
+        <div class="error-box">⚠️ {{ error }}</div>
+    {% endif %}
+
+    <div class="grid">
+
+        <!-- JD MANAGEMENT -->
+        <div class="card">
+            <h3>📌 Job Description Management</h3>
+            <p>Create and manage multiple job openings with custom screening criteria.</p>
+
+            <form method="post" action="/hr/upload_jd" enctype="multipart/form-data">
+
+                <input type="text" name="job_title"
+                    placeholder="Job Title (e.g., Software Engineer)" required>
+
+                <input type="number" name="min_score"
+                    placeholder="Minimum AI Match Score (e.g., 70)"
+                    min="0" max="100" required>
+
+                <input type="number" name="min_exp"
+                    placeholder="Minimum Experience in Years (e.g., 2)"
+                    min="0">
+
+                <input type="text" name="mandatory_skills"
+                    placeholder="Mandatory Skills (e.g., python, sql, machine learning)">
+
+                <small style="display:block;margin-bottom:12px;color:#666;">
+                    Candidates missing mandatory skills will be automatically rejected.
+                </small>
+
+                <div class="upload-box" onclick="document.getElementById('jd').click()">
+                    <label>Click to Upload JD File</label>
+                    <small>PDF or DOCX supported · Max 5 MB</small>
+                    <input type="file" id="jd" name="jd" accept=".pdf,.docx" required
+                           onchange="document.getElementById('jdFileName').innerText = this.files[0]?.name || ''">
+                    <div id="jdFileName"></div>
+                </div>
+
+                <button>Upload Job Opening</button>
+            </form>
+
+            <!-- JD LIST WITH TOGGLE -->
+            <div class="job-list">
+                <h4 style="margin-top:25px;font-size:15px;margin-bottom:10px;">
+                    Uploaded Jobs:
+                </h4>
+                {% if jds %}
+                    {% for job in jds %}
+                    {% set is_active = job.get('is_active', True) %}
+                    <div class="job-item {% if not is_active %}inactive{% endif %}">
+                        <div class="job-item-left">
+                            <b>{{ job.title }}</b>
+                            <span class="status-pill {% if is_active %}pill-active{% else %}pill-inactive{% endif %}">
+                                {{ "Active" if is_active else "Inactive" }}
+                            </span>
+                        </div>
+                        <div class="job-actions">
+                            <!-- Toggle active/inactive -->
+                            <a class="toggle-btn {% if is_active %}toggle-on{% else %}toggle-off{% endif %}"
+                               href="/hr/toggle_jd/{{ job._id }}"
+                               title="{{ 'Deactivate' if is_active else 'Reactivate' }}">
+                               {{ "Pause" if is_active else "Activate" }}
+                            </a>
+                            <a class="delete-btn" href="/hr/delete_jd/{{ job._id }}"
+                               onclick="return confirm('Permanently delete this job opening?')">
+                               Delete
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p style="font-size:13px;color:#666;margin-top:8px;">
+                        No job openings uploaded yet.
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- RESUME SCREENING -->
+        <div class="card">
+            <h3>🤖 AI Resume Screening</h3>
+            <p>Select an active job opening, upload candidate resumes, and run AI screening.</p>
+
+            <form method="post" action="/hr/analyze" enctype="multipart/form-data">
+                <label style="font-size:14px;font-weight:600;">Select Job Opening:</label>
+
+                <select name="jd_id" required>
+                    <option value="">-- Choose Job Role --</option>
+                    {% for job in jds %}
+                        {% if job.get('is_active', True) %}
+                            <option value="{{ job._id }}">{{ job.title }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+
+                <div class="upload-box" style="margin-top:18px;"
+                     onclick="document.getElementById('resumes').click()">
+                    <label>Click to Upload Candidate Resumes</label>
+                    <small>Multiple files allowed · PDF, DOCX, TXT · Max 5 MB each · Up to 20 files</small>
+                    <input type="file" id="resumes" name="resumes" multiple
+                           accept=".pdf,.docx,.txt" required
+                           onchange="
+                               var count = this.files.length;
+                               var msg = count + ' file(s) selected';
+                               if (count > 20) msg += ' — ⚠️ Only first 20 will be processed';
+                               document.getElementById('resumeFileName').innerText = msg;
+                           ">
+                    <div id="resumeFileName"></div>
+                </div>
+
+                <button>Run AI Screening →</button>
+            </form>
+        </div>
+
+    </div>
+
+    <!-- SCREENING HISTORY -->
+    <div class="history-section">
+        <h3>📋 Recent Screening History</h3>
+        {% if past_screenings %}
+            <div class="history-grid">
+                {% for s in past_screenings %}
+                <div class="history-card">
+                    <h4>{{ s.job_title }}</h4>
+                    <div class="meta">
+                        {{ s.timestamp.strftime('%d %b %Y, %I:%M %p') if s.timestamp else 'N/A' }}
+                    </div>
+                    <div class="counts">
+                        <span class="count-pill count-green">✅ {{ s.shortlisted|length }} Shortlisted</span>
+                        <span class="count-pill count-red">❌ {{ s.rejected|length }} Rejected</span>
+                        {% if s.get('total_redactions', 0) > 0 %}
+                        <span class="count-pill count-blue">🛡️ {{ s.total_redactions }} Redacted</span>
+                        {% endif %}
+                    </div>
+                    <a href="/hr/screening/{{ s._id }}" class="view-btn">View Results →</a>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="empty-history">No screening history yet. Run your first screening above.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+</body>
+</html>
