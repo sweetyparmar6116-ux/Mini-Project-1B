@@ -12,6 +12,7 @@ import csv
 import pdfplumber
 import docx
 import pandas as pd
+from dotenv import load_dotenv
 
 from fpdf import FPDF
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -20,14 +21,17 @@ from sklearn.metrics.pairwise import cosine_similarity
 from semantic_matcher import sbert_similarity
 from werkzeug.security import generate_password_hash, check_password_hash
 
-
+load_dotenv()
 # ===================== Flask Setup =====================
 app = Flask(__name__)
-app.secret_key = "final_secret_key"
+app.secret_key = os.getenv("SECRET_KEY", "dev-only-change-me")
 
 
 # ===================== MongoDB Setup =====================
-app.config["MONGO_URI"] = "mongodb+srv://resume_user:fcritru12345@cluster0.vpqwj7a.mongodb.net/ai_resume_db?retryWrites=true&w=majority"
+app.config["MONGO_URI"] = os.getenv(
+    "MONGO_URI",
+    "mongodb://localhost:27017/ai_resume_db"
+)
 mongo = PyMongo(app)
 
 users      = mongo.db.users
@@ -883,4 +887,7 @@ def server_error(e):
 
 # ===================== Run =====================
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+  app.run(
+    debug=os.getenv("FLASK_DEBUG", "0") == "1",
+    port=5000
+)
