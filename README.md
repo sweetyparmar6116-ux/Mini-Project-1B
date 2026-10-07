@@ -1,195 +1,176 @@
 # TalentIQ
 
-TalentIQ is a web-based resume screening and candidate evaluation system developed as a college mini-project to compare candidate resumes with job descriptions using keyword similarity and semantic similarity.
+TalentIQ is a web-based resume screening and candidate evaluation system developed as a college mini-project. It compares candidate resumes with job descriptions using keyword-based and semantic similarity techniques.
 
 ## 📌 Project Overview
 
-This project is built for two main user groups:
+TalentIQ provides two workflows:
 
-- HR users can upload job descriptions, review active openings, upload multiple candidate resumes, and assess screening results.
-- Candidate users can select a job, upload an existing resume or build one using the in-app form, and view how closely their profile matches the selected role.
+- **HR:** Upload job descriptions, configure screening criteria, upload candidate resumes, and review screening results.
+- **Candidates:** Select a job, upload an existing resume or create one using the resume builder, and view how closely their profile matches the selected role.
 
-The application reads resumes from PDF, DOCX, and TXT files, cleans the extracted text, extracts relevant skill and experience information, compares the resume with a job description, and shows a match score along with shortlist or rejection decisions.
+The application supports PDF, DOCX, and TXT resumes. It extracts and processes resume text, identifies relevant skills and experience, compares the resume with the selected job description, and generates a match score.
 
-The project is implemented as a local Flask application that stores its data in MongoDB.
+The application is implemented using **Flask** with **MongoDB** as the database.
 
 ## 🎯 Problem Statement
 
-Manual resume screening is time-consuming and difficult to manage when a large number of applications need to be reviewed. HR teams often need to compare candidate profiles against job requirements without a consistent evaluation method.
+Manual resume screening can be time-consuming when HR teams need to review multiple applications. Candidates may also find it difficult to understand how well their qualifications match a particular job.
 
-At the same time, candidates may not understand whether their resume matches the role they are applying for, or which skills they may need to strengthen. The project addresses this by giving both sides a simple workflow: HR can screen multiple resumes quickly, and candidates can check how closely their profile aligns with a selected job description.
+TalentIQ addresses these problems by providing an automated screening workflow that compares resumes with job requirements and presents the results in an easy-to-understand format.
 
 ## 💡 Proposed Solution
 
-The application stores job descriptions and screening records in MongoDB and uses Flask routes to manage both HR and candidate workflows.
-
 For each resume, the system:
 
-- reads text from an uploaded file,
-- cleans the text,
-- removes common personal identifiers before scoring,
-- extracts skills and experience-related information,
-- compares the resume with the selected job description,
-- calculates a match score,
-- displays matched skills and skill-gap categories,
-- decides whether the candidate should be shortlisted or rejected based on the configured rules.
+1. Extracts text from the uploaded file.
+2. Cleans and normalizes the extracted text.
+3. Removes selected personal identifiers before scoring.
+4. Extracts skills and experience-related information.
+5. Compares the resume with the selected job description.
+6. Calculates keyword and semantic similarity scores.
+7. Generates a final match score.
+8. Applies the configured screening criteria.
+9. Displays matched skills, skill-gap categories, and the final screening decision.
 
-This is a practical academic project for automated resume screening rather than a production recruitment system.
+The project is intended as an academic implementation of automated resume screening rather than a production recruitment system.
 
 ## ✨ Features
 
-### Candidate-side features
+### Candidate Features
 
-- Resume upload in PDF, DOCX, or TXT format
-- Resume creation using an in-app form
-- Resume preview before scoring
-- Match score for the selected job
-- Display of matched skills and missing skill categories
-- Skill-gap guidance based on missing areas from the job description
-- Download of a generated PDF resume for built resumes
-- Signup and login for candidate and HR roles
+- Upload resumes in PDF, DOCX, or TXT format
+- Create resumes using an in-app resume builder
+- Preview a created resume
+- Check resume match score against a selected job
+- View semantic and keyword matching scores
+- View matched skills
+- View skill-gap categories
+- Download generated PDF resumes
+- Candidate signup and login
 
-### HR-side features
+### HR Features
 
 - Upload and manage job descriptions
-- Set minimum score, minimum experience, and mandatory skills for each job
+- Set minimum match score
+- Set minimum experience requirement
+- Specify mandatory skills
 - Activate or deactivate job listings
-- Upload multiple candidate resumes for screening
+- Upload multiple candidate resumes
 - View shortlisted and rejected candidates
-- Review scoring breakdown and rejection reasons
-- Export shortlisted results as CSV
-- Review recent screening history
+- View scoring breakdown and rejection reasons
+- Export shortlisted candidates as CSV
+- Review previous screening results
 
 ## 🧠 How the System Works
 
-### Candidate workflow
+### Candidate Workflow
 
-1. The candidate signs up or logs in.
-2. The candidate selects an active job opening from the dashboard.
-3. The candidate either uploads an existing resume or fills the resume builder form with summary, skills, experience, projects, education, and certifications.
-4. The application stores the resume content in session data and in MongoDB.
-5. The candidate clicks the option to check the match score.
-6. The project extracts text from the uploaded file or composes text from the resume form fields.
-7. The resume text is cleaned and compared with the selected job description.
-8. The result page displays:
-   - final match score,
-   - semantic score,
-   - keyword score,
-   - matched skills,
-   - category-based skill gaps,
-   - a notice indicating that personal identifiers were removed before scoring.
+1. Candidate signs up or logs in.
+2. Candidate selects an active job opening.
+3. Candidate uploads an existing resume or creates one using the resume builder.
+4. Resume information is processed by the application.
+5. Personal identifiers are removed before scoring.
+6. Resume content is compared with the selected job description.
+7. TF-IDF and semantic similarity scores are calculated.
+8. The final match score is displayed along with matched skills and skill-gap categories.
 
-### HR workflow
+### HR Workflow
 
-1. HR signs up or logs in with the HR role.
-2. HR uploads a job description file (PDF or DOCX) and provides a job title, minimum score, minimum experience, and optional mandatory skills.
-3. The job description is stored in MongoDB and appears in the HR dashboard.
-4. HR selects an active job and uploads candidate resumes.
-5. For each resume file, the backend:
-   - reads the text,
-   - cleans the text,
-   - removes personal identifiers,
-   - extracts skills and experience,
-   - compares the resume and job description,
-   - applies the minimum score and other filters.
-6. The results page shows shortlisted and rejected candidates.
-7. HR can export the shortlist as a CSV and review prior screening history.
+1. HR signs up or logs in.
+2. HR creates a job opening by uploading a job description.
+3. Screening criteria such as minimum score, experience, and mandatory skills can be configured.
+4. HR selects an active job opening.
+5. Candidate resumes are uploaded for screening.
+6. Each resume is processed and compared with the job description.
+7. Candidates are shortlisted or rejected according to the configured criteria.
+8. HR can review results and export shortlisted candidates as CSV.
 
-## 🔬 Matching / Resume Processing
+## 🔬 Resume Processing and Matching
 
-### 1. File loading and text extraction
+### 1. Resume Text Extraction
 
-The application accepts `.pdf`, `.docx`, and `.txt` files. In `app.py`, the `load_file()` function checks the extension and file size before reading the file.
+The application supports:
 
-Implementation details:
+- **PDF** — text extracted using `pdfplumber`
+- **DOCX** — text extracted using `python-docx`
+- **TXT** — read as UTF-8 text
 
-- `.txt`: read as UTF-8 text
-- `.docx`: uses `docx.Document(file)` and reads paragraph text
-- `.pdf`: uses `pdfplumber.open(file)` and extracts text from each page
+The extracted content is cleaned and normalized before matching.
 
-The extracted text is normalized with `clean_text()`, which converts it to lowercase and removes non-alphanumeric characters to simplify the content before comparison.
+### 2. Skill Extraction
 
-### 2. Skill extraction
-
-The project loads skill words from Excel files at startup:
+The project uses two Excel files as skill sources:
 
 - `skills_onet.xlsx`
 - `Technology Skills.xlsx`
 
-This is done in `load_skills()`:
+The application loads the skill information using `pandas` and creates a skill database.
 
-- reads both Excel files using `pandas.read_excel()`
-- filters the O*NET data where `Scale Name == "Importance"` and `Data Value >= 3`
-- combines the resulting skill names with example technology skills
-- stores them in a set called `SKILL_DB`
+Skills are then detected in resumes and job descriptions using text matching.
 
-The function `skills_in_text(text)` checks which skills appear in a resume or job description using regex word-boundary matching.
+### 3. Experience Extraction
 
-### 3. Experience extraction
-
-The function `extract_experience_years(text)` searches for patterns such as:
+The application identifies experience information from resume text using patterns such as:
 
 - `3 years`
 - `5 yrs`
 - `2+ years`
 - `since 2019`
 
-It converts the extracted value into an integer and caps the result at 40 years to avoid unrealistic values.
+The extracted experience value is capped at 40 years to avoid unrealistic values caused by parsing errors.
 
-### 4. TF-IDF matching
+### 4. TF-IDF Matching
 
-The project uses scikit-learn's `TfidfVectorizer` and `cosine_similarity`.
+The project uses `TfidfVectorizer` and cosine similarity from **scikit-learn**.
 
-In `score_resume(resume, jd)`, both the cleaned resume and the cleaned job description are transformed with TF-IDF, and cosine similarity is computed between them. The result is converted to a percentage and stored as `tfidf`.
+TF-IDF measures the importance of words in the resume and job description and compares their similarity.
 
-This part captures keyword overlap and term importance in the resume and job description.
+This helps identify overlap between the candidate's resume and the job requirements.
 
-### 5. Semantic matching
+### 5. Semantic Matching
 
-The project also uses a sentence-transformers model:
+The project also uses **SentenceTransformer** with the:
 
-- `SentenceTransformer("all-MiniLM-L6-v2")`
-- defined in `semantic_matcher.py`
-
-The function `sbert_similarity(text1, text2)`:
-
-- encodes both strings into embeddings,
-- computes cosine similarity using `util.cos_sim`,
-- returns a score in the range 0–100.
-
-This allows the project to compare the semantic meaning of the resume and the job description beyond exact word matches.
-
-### 6. Final matching formula
-
-The final score in `score_resume()` is calculated as:
-
-```python
-final = round(0.6 * semantic + 0.4 * tfidf, 2)
+```text
+all-MiniLM-L6-v2
 ```
 
-This exact formula appears in the source code. The semantic score is weighted more heavily than the TF-IDF score.
+model.
 
-### 7. PII stripping and privacy-related screening
+The resume and job description are converted into embeddings, and cosine similarity is used to compare their semantic meaning.
 
-The project includes `PII_PATTERNS` and a `strip_pii()` function in `app.py`.
+This allows the system to identify similarity beyond exact keyword matches.
 
-It removes patterns such as:
+### 6. Final Match Score
 
-- email addresses
-- phone numbers
-- gendered titles such as Mr., Ms., and Dr.
-- date patterns and DOB-like entries
-- selected demographic fields including nationality, religion, marital status, caste, and gender
+The final score is calculated using:
 
-The cleaned text is then used for scoring. The code also tracks a `redacted_count` and passes it to the result pages, so the interface can show how many personal identifiers were removed before evaluation.
+```text
+Final Score = 0.6 × Semantic Score + 0.4 × TF-IDF Score
+```
 
-This is a real feature in the project and should be described as a bias-mitigation step rather than a production security feature.
+The semantic score therefore contributes 60% and the TF-IDF score contributes 40% to the final result.
 
-### 8. Skill-gap analysis
+### 7. PII Removal
 
-The project does not simply print a raw list of missing keywords. Instead, it maps missing skills to category groups using `get_skill_category_gaps(missing_skills)`.
+Before scoring, the application removes selected personal identifiers such as:
 
-Examples of categories in the code include:
+- Email addresses
+- Phone numbers
+- Gendered titles
+- Date/DOB patterns
+- Selected demographic information
+
+The application also tracks the number of redactions.
+
+This feature is intended as a **bias-mitigation step** so that selected personal information does not directly influence the matching process.
+
+### 8. Skill-Gap Analysis
+
+The application groups missing skills into broader categories instead of displaying only a raw list of missing keywords.
+
+Examples include:
 
 - Cloud & DevOps
 - Data & Analytics
@@ -197,45 +178,45 @@ Examples of categories in the code include:
 - Web Development
 - Programming Languages
 - Databases
-- Soft Skills & PM
 - Security
 - Mobile Development
+- Soft Skills & PM
 
-The function groups missing skill terms into these categories and adds trend text from `TREND_CONTEXT` such as cloud, AI/ML, and data-related insights.
+### 9. Screening Filters
 
-### 9. Mandatory filters and rejection logic
+HR can configure:
 
-In `hr_analyze()`, each candidate result is evaluated against the job settings:
+- Minimum match score
+- Minimum experience
+- Mandatory skills
 
-- minimum score threshold
-- minimum experience threshold
-- mandatory skills list
+A candidate who fails one or more configured conditions can be rejected with a corresponding reason.
 
-If a candidate fails any of these conditions, a rejection reason is added.
+### 10. Duplicate Resume Detection
 
-### 10. Duplicate resume detection
+The application compares a newly submitted resume with previous resumes submitted for the same job and user.
 
-The project includes `is_duplicate_resume(resume_text, job_id, username)`. It compares a new resume against earlier resumes submitted for the same job and user using TF-IDF cosine similarity. If the similarity is greater than or equal to `0.95`, the application treats it as a duplicate and blocks the submission.
+TF-IDF cosine similarity is used for comparison. A similarity of **0.95 or higher** is treated as a duplicate.
 
 ## 🛠️ Technology Stack
 
 | Technology | Purpose |
 |---|---|
-| Python | Core backend language for application logic and resume processing |
-| Flask | Web framework for routing, templates, and request handling |
-| Flask-PyMongo | MongoDB integration with Flask |
-| MongoDB | Database for users, job descriptions, resumes, and screening records |
-| pandas | Reads Excel data files for skill matching |
-| scikit-learn | Uses TF-IDF vectorizer and cosine similarity for keyword-based matching |
-| sentence-transformers | Loads the `all-MiniLM-L6-v2` model for semantic similarity |
-| pdfplumber | Extracts text from PDF resume files |
-| python-docx | Reads text from DOCX resume files |
-| FPDF | Generates PDF output for built resumes |
-| python-dotenv | Loads environment variables from a `.env` file |
+| Python | Backend and application logic |
+| Flask | Web framework |
+| MongoDB | Database |
+| Flask-PyMongo | Flask-MongoDB integration |
+| pandas | Processing Excel skill data |
+| scikit-learn | TF-IDF and cosine similarity |
+| Sentence Transformers | Semantic similarity using SBERT |
+| pdfplumber | PDF text extraction |
+| python-docx | DOCX text extraction |
+| FPDF | PDF resume generation |
+| python-dotenv | Environment variable management |
 | Werkzeug | Password hashing and verification |
-| HTML/CSS | User interface pages for candidate and HR dashboards |
-| Jinja2 | Template rendering for Flask pages |
-| Excel files (`.xlsx`) | Data sources for skill lookup and technology keyword matching |
+| HTML/CSS | Web interface |
+| Jinja2 | Flask template rendering |
+| Excel | Skill datasets |
 
 ## 📂 Project Structure
 
@@ -245,123 +226,110 @@ Mini-Project-1B/
 ├── .gitignore
 ├── README.md
 ├── Technology Skills.xlsx
+├── skills_onet.xlsx
 ├── app.py
+├── resumer_parser.py
+├── semantic_matcher.py
+├── requirements.txt
+│
+├── index.html
+├── login.html
+├── signup.html
+│
 ├── candidate_create.html
 ├── candidate_dashboard.html
 ├── candidate_preview.html
 ├── candidate_result.html
 ├── candidate_upload.html
+│
 ├── hr_dashboard.html
 ├── hr_results.html
-├── index.html
-├── login.html
-├── no_jd.html
-├── requirements.txt
-├── resumer_parser.py
-├── semantic_matcher.py
-├── signup.html
-├── skills_onet.xlsx
-└── .pyc files generated at runtime
+└── no_jd.html
 ```
 
-### Important files
+### Important Files
 
-- `app.py`: Main Flask application. It includes routes for login, signup, HR workflows, candidate workflows, resume processing, scoring, filtering, and result generation.
-- `semantic_matcher.py`: Defines the SBERT similarity function and loads the sentence-transformers model.
-- `resumer_parser.py`: Utility for extracting text from PDF and DOCX files using `pdfplumber` and `python-docx`.
-- `candidate_*.html`: Candidate pages for dashboard, upload, preview, and result display.
-- `hr_*.html`: HR pages for job management, screening, and result display.
-- `index.html`: Landing page for the application.
-- `login.html` and `signup.html`: Authentication pages.
-- `skills_onet.xlsx` and `Technology Skills.xlsx`: Skill datasets used to build the skill database.
-- `.env.example`: Environment variable template.
-- `requirements.txt`: Minimal dependency file included in the repository; it does not contain the full dependency list used by the project.
+| File | Purpose |
+|---|---|
+| `app.py` | Main Flask application and application routes |
+| `semantic_matcher.py` | SentenceTransformer semantic similarity |
+| `resumer_parser.py` | PDF and DOCX resume text extraction |
+| `candidate_*.html` | Candidate-side pages |
+| `hr_*.html` | HR-side pages |
+| `login.html` | Login interface |
+| `signup.html` | Registration interface |
+| `skills_onet.xlsx` | O*NET-based skill data |
+| `Technology Skills.xlsx` | Technology skill data |
+| `.env.example` | Environment variable template |
+| `requirements.txt` | Python dependencies |
 
 ## ⚙️ Installation and Setup
 
 ### Prerequisites
 
-- Python installed on the system
-- MongoDB running locally or available through a valid connection URI
-- pip package manager
-- Git for cloning the repository
+- Python 3.9 or later
+- MongoDB
+- Git
+- pip
 
-### Python version
-
-The repository does not explicitly declare a required Python version. The code uses modern Python libraries and is generally compatible with Python 3.9+.
-
-### Required packages
-
-The repository does not provide a complete dependency list covering every imported package. Based on the source code, the application uses:
+### 1. Clone the Repository
 
 ```bash
-pip install flask flask-pymongo python-dotenv scikit-learn sentence-transformers pdfplumber python-docx fpdf pandas werkzeug
+git clone https://github.com/sweetyparmar6116-ux/Mini-Project-1B.git
+cd Mini-Project-1B
 ```
 
-The project also includes a `requirements.txt` file, but it currently contains only:
+### 2. Create a Virtual Environment
 
-```txt
-python-dotenv
+**Windows:**
+
+```bash
+python -m venv venv
+venv\Scripts\activate
 ```
 
-This means the full dependency setup is not completely captured in the repository file.
+**macOS/Linux:**
 
-### Environment variables
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
 
-The project uses the variables shown in `.env.example`:
+### 3. Install Dependencies
 
-```env
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Configure Environment Variables
+
+Create a `.env` file based on `.env.example`.
+
+Example:
+
+```text
 MONGO_URI=mongodb://localhost:27017/ai_resume_db
 SECRET_KEY=change-this-for-local-development
 FLASK_DEBUG=0
 ```
 
-Create a local `.env` file in the project root if you want to override the default values.
+Use appropriate local values for your environment.
 
-### Database setup
+### 5. Start MongoDB
 
-The application uses MongoDB and connects with:
-
-```python
-app.config["MONGO_URI"] = os.getenv("MONGO_URI", "mongodb://localhost:27017/ai_resume_db")
-```
-
-So a local MongoDB instance at `mongodb://localhost:27017` is the default expectation.
-
-### Local setup steps
-
-```bash
-git clone https://github.com/sweetyparmar6116-ux/Mini-Project-1B.git
-cd Mini-Project-1B
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install flask flask-pymongo python-dotenv scikit-learn sentence-transformers pdfplumber python-docx fpdf pandas werkzeug
-cp .env.example .env
-```
-
-Then edit `.env` if needed before running the application.
+Make sure MongoDB is running and accessible using the configured `MONGO_URI`.
 
 ## ▶️ Running the Application
 
-The entry point is the main Flask file:
+Run the Flask application:
 
 ```bash
 python app.py
 ```
 
-In `app.py`, the application starts with:
+The application runs on port `5000` by default.
 
-```python
-if __name__ == "__main__":
-    app.run(
-        debug=os.getenv("FLASK_DEBUG", "0") == "1",
-        port=5000
-    )
-```
-
-This means the application runs on port `5000` by default.
-
-Open the application in a browser at:
+Open:
 
 ```text
 http://localhost:5000
@@ -370,94 +338,31 @@ http://localhost:5000
 ## 📊 Example Workflow
 
 ```text
-Input:
-  HR uploads a job description and a candidate uploads a PDF resume.
-
-Processing:
-  - file text is extracted
-  - text is cleaned
-  - personal identifiers are removed
-  - skills are compared against the job description
-  - experience is extracted
-  - TF-IDF and semantic similarity are computed
-
-Matching:
-  - TF-IDF score is computed for resume vs. JD
-  - SBERT score is computed for semantic similarity
-  - final score = 0.6 * semantic + 0.4 * tfidf
-
-Result:
-  - candidate is shortlisted or rejected
-  - matched skills and skill-gap categories are shown
-  - HR receives a ranked list or rejection list
+Job Description + Resume
+          ↓
+    Text Extraction
+          ↓
+      Text Cleaning
+          ↓
+     PII Removal
+          ↓
+     Skill Extraction
+          ↓
+ ┌─────────────────────┐
+ │ TF-IDF Similarity   │
+ │ Semantic Similarity│
+ └─────────────────────┘
+          ↓
+   Final Match Score
+          ↓
+ Screening Criteria
+          ↓
+ Shortlist / Rejection
+          ↓
+ Results & Skill Gaps
 ```
+## 📌 Project Summary
 
-This is an accurate representation of the project workflow implemented in the repository.
+TalentIQ demonstrates a practical approach to automated resume screening using **Flask, MongoDB, Python, TF-IDF, SentenceTransformer semantic similarity, and skill extraction**.
 
-## 📸 Screenshots
-
-No screenshots are included in the repository. The following names can be used as placeholders for future screenshots:
-
-```text
-screenshots/
-├── home.png
-├── login.png
-├── signup.png
-├── candidate-dashboard.png
-├── candidate-upload.png
-├── candidate-preview.png
-├── candidate-results.png
-├── hr-dashboard.png
-├── hr-results.png
-└── results-export.png
-```
-
-These names correspond to actual screens present in the project.
-
-## 🧪 Testing
-
-The repository does not include an automated testing suite such as `pytest` or a `tests/` directory.
-
-At present, the project appears to rely on manual browser-based verification and local use of the Flask application. There is no repository evidence of a formal automated test run.
-
-## ⚠️ Limitations
-
-This project has several practical limitations based on the actual implementation:
-
-- It depends on the quality of PDF and DOCX text extraction.
-- The skill database is based on Excel files and is not a large enterprise-level dataset.
-- The matching logic does not provide detailed explainability for each score component beyond matched and missing skill information.
-- The application is a local Flask project with MongoDB, rather than a cloud-hosted or production-ready system.
-- The user interface is intended for academic demonstration and local use rather than large-scale recruitment operations.
-- Some matching results depend heavily on the quality of the resume text and the skill data used to detect keywords.
-
-## 🚀 Future Enhancements
-
-The following are realistic future improvements and are not currently implemented in the repository:
-
-- Improved resume parsing for more complex document layouts
-- Larger and more detailed skill datasets
-- Better explanation of candidate scores and ranking logic
-- Stronger role-based permissions and authentication controls
-- Cloud deployment for MongoDB and the application
-- More advanced candidate analytics and dashboard reporting
-- Formal automated test suite for validation
-- Improved recommendation logic for job matching across multiple roles
-
-## 👥 Project Team
-
-```text
-- [Name 1]
-- [Name 2]
-- [Name 3]
-```
-
-## 📄 License
-
-No license has currently been specified for this project.
-
-## Final Notes
-
-This project demonstrates a practical workflow for resume screening using Flask, MongoDB, and Python-based text processing. It is suitable for academic study and viva explanation because it shows how text extraction, skill matching, semantic comparison, and shortlist/rejection logic are implemented in a small web application.
-
-It is a student mini-project and should be presented as such rather than as a production-ready or enterprise-level system.
+The project combines text extraction, skill identification, semantic comparison, and configurable screening criteria into a single web application for candidate and HR workflows.
